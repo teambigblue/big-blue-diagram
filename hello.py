@@ -1,7 +1,7 @@
-from flask import Flask
+from flask import Flask, render_template,request,url_for,redirect,flash,session,Response
 app = Flask(__name__)
 
-@app.route("/")
+@app.route("/",methods=["POST","GET"])
 def hello():
     return render_template("main.html")
 
