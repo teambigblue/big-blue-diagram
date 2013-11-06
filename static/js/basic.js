@@ -51,8 +51,9 @@ function crtLink(node1,node2) {
     if (node1x > node2x) {
 	if (node1y > node2y) {
 	    if(Math.atan2(node1y-node2y,node1x-node2x) > PI/4)
-		crtarrow(node1x+node1h,node1y+node1w,node2x+node2h,node2y+node2w);
-
+		crtarrow(node1x+node1w,node1y+node1h,node2x+node2w,node2y+node2h,"up","black");
+	    //else
+	//	crtarrow(node1x+node1
 	}
     }
 }
