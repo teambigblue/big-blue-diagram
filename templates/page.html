@@ -4,7 +4,7 @@
 </meta>
   <head>
     Nathaniel's SVG Playground
-  <link href="../static/bootstrap/css/bootstrap.css" rel="stylesheet" media="screen">
+  <link href="../static/dist/css/bootstrap.css" rel="stylesheet" media="screen">
   </head>
   <body id="page">
     <script type="text/javascript" src="../static/js/jquery-2.0.3.min.js"></script>
@@ -12,10 +12,10 @@
     <script type="text/javascript" src="../static/js/jquery-ui-1.10.3.custom.js"></script>
     <script type="text/javascript" src="../static/js/basic.js"></script>
       
-    <div id="toolbar" class="ui-widget-content toolborder" style="z-index:5; position:absolute;">
-      <span>Toolbar</span><br>  
-      <button id="addrect">Add Rectangle</button><br>
-      <button id="addlink">Create A Link</button><br>
+    <div id="toolbar" class="ui-widget-content toolborder navbar navbar-inverse" style="z-index:5; position:absolute;">
+      <p class="navbar-text navbar-left tooltext">Toolbar</p>
+      <button class="btn navbar-btn btn-info" id="addrect">Add Rectangle</button><br>
+      <button class="btn navbar-btn btn-info" id="addlink">Create A Link</button><br>
     </div>
     <svg id="canvas">
       
