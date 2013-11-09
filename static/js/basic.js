@@ -95,10 +95,20 @@ function crtRect(x,y) {
 	}
     });
     $(currect).attr('id',"r"+objectStack.rects.length.toString());
+    currect.head = [];
+    currect.tail = [];
     $(currect).draggable();
     $(currect).bind('drag', function(event, ui){
+	var dx = event.target.getAttribute('x') - ui.position.left; 
+	var dy = event.target.getAttribute('y') - ui.position.top;
         event.target.setAttribute('x', ui.position.left);
 	event.target.setAttribute('y', ui.position.top);
+	for(var i=0;i<event.target.head.length;i++) {
+	    changeArrowHead(event.target.head[i],dx,dy)
+	}
+	for(var i=0;i<event.target.tail.length;i++) {
+	    changeArrowTail(event.target.tail[i],dx,dy)	    
+	}
     });
     objectStack.rects.push(currect);
 }
@@ -160,6 +170,15 @@ function changeArrowStroke(x) {
     arrowstroke = x;
 }
 
+function changeArrowHead(arrow,x,y) {
+    
+}
+
+function changeArrowTail(arrow,dx,dy) {
+    arrow.shaft.setAttribute('x1',(parseInt(arrow.shaft.getAttribute('x1'))-parseInt(dx)).toString());
+    arrow.shaft.setAttribute('y1',(parseInt(arrow.shaft.getAttribute('y1'))-parseInt(dy)).toString());
+}
+
 function crtLink(obj) {
     var node1 = obj.node1;
     var node2 = obj.node2;
@@ -205,18 +224,18 @@ function crtLink(obj) {
 	if (pt1) {
 	    if (y2 > y1) {
 		if (x2 > x1) {
-		    crtArrow(x1,y1,x2,y2,"downr","red");
+		    var newarw = crtArrow(x1,y1,x2,y2,"downr","red");
 		}
 		else {
-		    crtArrow(x1,y1,x2,y2,"downl","red");
+		    var newarw = crtArrow(x1,y1,x2,y2,"downl","red");
 		}
 	    }
 	    else {
 		if (x2 > x1) {
-		    crtArrow(x1,y1,x2,y2,"upr","red");
+		    var newarw = crtArrow(x1,y1,x2,y2,"upr","red");
 		}
 		else {
-		    crtArrow(x1,y1,x2,y2,"upl","red");
+		    var newarw = crtArrow(x1,y1,x2,y2,"upl","red");
 		}
 	    }   
 	}
@@ -230,36 +249,52 @@ function crtLink(obj) {
 	    if (n1x > n2x) {
 		if (n1y > n2y) {
 		    if(Math.atan2(n1y-n2y,n1x-n2x) > Math.PI/4){
-			crtArrow(n1x,n1y-(n1h/2),n2x,n2y+(n2h/2),"upl","red");
+			var newarw = crtArrow(n1x,n1y-(n1h/2),n2x,n2y+(n2h/2),"upl","red");
+			node1.tail.push(newarw);
+			node2.head.push(newarw);
 		    }
 		    else {
-			crtArrow(n1x-(n1w/2),n1y,n2x+(n1w/2),n2y,"upl","red");
+			var newarw = crtArrow(n1x-(n1w/2),n1y,n2x+(n1w/2),n2y,"upl","red");
+			node1.tail.push(newarw);
+			node2.head.push(newarw);
 		    }
 		}
 		else {
 		    if(Math.atan2(n1y-n2y,n1x-n2x) < -Math.PI/4){
-			crtArrow(n1x,n1y+(n1h/2),n2x,n2y-(n2h/2),"downl","red");
+			var newarw = crtArrow(n1x,n1y+(n1h/2),n2x,n2y-(n2h/2),"downl","red");
+			node1.tail.push(newarw);
+			node2.head.push(newarw);
 		    }
 		    else {
-			crtArrow(n1x-(n1h/2),n1y,n2x,n2y-(n2h/2),"downl","red");
+			var newarw = crtArrow(n1x-(n1h/2),n1y,n2x,n2y-(n2h/2),"downl","red");
+			node1.tail.push(newarw);
+			node2.head.push(newarw);
 		    }
 		}
 	    }
 	    else {
 		if (n1y > n2y) {
 		    if(Math.atan2(n2y-n1y,n2x-n1x) > -Math.PI/4){
-			crtArrow(n1x,n1y-(n1h/2),n2x-(n2w/2),n2y,"upr","red");
+			var newarw = crtArrow(n1x,n1y-(n1h/2),n2x-(n2w/2),n2y,"upr","red");
+			node1.tail.push(newarw);
+			node2.head.push(newarw);
 		    }
 		    else {
-			crtArrow(n1x,n1y-(n1h/2),n2x,n2y+(n2h/2),"upr","red");
+			var newarw = crtArrow(n1x,n1y-(n1h/2),n2x,n2y+(n2h/2),"upr","red");
+			node1.tail.push(newarw);
+			node2.head.push(newarw);
 		    }
 		}
 		else {
 		    if(Math.atan2(n2y-n1y,n2x-n1x) < Math.PI/4){
-			crtArrow(n1x+(n1w/2),n1y,n2x-(n2w/2),n2y,"downr","red");
+			var newarw = crtArrow(n1x+(n1w/2),n1y,n2x-(n2w/2),n2y,"downr","red");
+			node1.tail.push(newarw);
+			node2.head.push(newarw);
 		    }
 		    else {
-			crtArrow(n1x,n1y+(n1h/2),n2x,n2y-(n2h/2),"downr","red");
+			var newarw = crtArrow(n1x,n1y+(n1h/2),n2x,n2y-(n2h/2),"downr","red");
+			node1.tail.push(newarw);
+			node2.head.push(newarw);
 		    }
 		}
 	    }
@@ -268,36 +303,44 @@ function crtLink(obj) {
 	    if(x1 > n2x) {
 		if (y1 > n2y) {
 		    if(Math.atan2(y1-n2y,x1-n2x) > Math.PI/4){
-			crtArrow(x1,y1,n2x,n2y+(n2h/2),"upl","red");
+			var newarw = crtArrow(x1,y1,n2x,n2y+(n2h/2),"upl","red");
+			node2.head.push(newarw);
 		    }
 		    else {
-			crtArrow(x1-(n1w/2),y1,n2x+(n1w/2),n2y,"upl","red");
+			var newarw = crtArrow(x1-(n1w/2),y1,n2x+(n1w/2),n2y,"upl","red");
+			node2.head.push(newarw);
 		    }
 		}
 		else {
 		    if(Math.atan2(y1-n2y,x1-n2x) < -Math.PI/4){
-			crtArrow(x1,y1,n2x,n2y-(n2h/2),"downl","red");
+			var newarw = crtArrow(x1,y1,n2x,n2y-(n2h/2),"downl","red");
+			node2.head.push(newarw);
 		    }
 		    else {
-			crtArrow(x1,y1,n2x,n2y-(n2h/2),"downl","red");
+			var newarw = crtArrow(x1,y1,n2x,n2y-(n2h/2),"downl","red");
+			node2.head.push(newarw);
 		    }
 		}
 	    }
 	    else {
 		if (y1 > n2y) {
 		    if(Math.atan2(n2y-y1,n2x-x1) > -Math.PI/4){
-			crtArrow(x1,y1,n2x-(n2w/2),n2y,"upr","red");
+			var newarw = crtArrow(x1,y1,n2x-(n2w/2),n2y,"upr","red");
+			node2.head.push(newarw);
 		    }
 		    else {
-			crtArrow(x1,y1,n2x,n2y+(n2h/2),"upr","red");
+			var newarw = crtArrow(x1,y1,n2x,n2y+(n2h/2),"upr","red");
+			node2.head.push(newarw);
 		    }
 		}
 		else {
 		    if(Math.atan2(n2y-y1,n2x-x1) < Math.PI/4){
-			crtArrow(x1,y1,n2x-(n2w/2),n2y,"downr","red");
+			var newarw = crtArrow(x1,y1,n2x-(n2w/2),n2y,"downr","red");
+			node2.head.push(newarw);
 		    }
 		    else {
-			crtArrow(x1,y1,n2x,n2y-(n2h/2),"downr","red");
+			var newarw = crtArrow(x1,y1,n2x,n2y-(n2h/2),"downr","red");
+			node2.head.push(newarw);
 		    }
 		}
 	    }
