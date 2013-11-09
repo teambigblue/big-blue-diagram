@@ -7133,7 +7133,7 @@ td.visible-print {
 }
 
 .workspace{
-    background-color: #000000;
+    background-color: white;
     width:8.5in;
     height:11in;
     z-index: 4;
