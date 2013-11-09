@@ -176,7 +176,7 @@ function changeArrowStroke(x) {
 function changeArrowHead(arrow,dx,dy) {
     arrow.head.getAttribute('x');
     arrow.head.getAttribute('y');
-    arrow.head.setAttribute('transform','translate('+
+    arrow.head.setAttribute('transform','translate(');
 }
 
 function changeArrowTail(arrow,dx,dy) {
