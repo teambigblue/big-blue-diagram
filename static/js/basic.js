@@ -1,45 +1,155 @@
 var arrowwidth = 7;
 var arrowstroke = 2;
+var eventStack;
+var objectStack;
 
 $(document).ready(function() {
     $("#canvas").svg();
     $("#toolbar").draggable();
     svg = $("#canvas").svg('get');
+    initCanvas();
+    initEventStack();
+    readyToolbar();
+    initObjectStack();
 });
+
+function initObjectStack() {
+    objectStack = new Object();
+    objectStack.rects = [];
+    objectStack.links = [];
+}
+
+function initEventStack() {
+    eventStack = new Object();
+    eventStack.addingRect = false;
+    eventStack.addingLink1 = false;
+    eventStack.linkPt;
+    eventStack.linkNode;
+    eventStack.addingLink2 = false;
+}
+
+function initCanvas() {
+    $("#canvas").click(function(e) {
+	if (eventStack.addingRect) {
+	    crtRect(e.clientX,e.clientY);
+	    eventStack.addingRect = false;
+	}
+	else if (eventStack.addingLink1 && !eventStack.addingLink2) {
+	    eventStack.addingLink2 = true;
+	    eventStack.linkPt = [e.clientX,e.clientY];
+	    eventStack.addingLink1 = false;
+	}
+	else if (eventStack.addingLink2 && !eventStack.linkNode) {
+	    var linkobj = new Object();
+	    eventStack.addingLink2 = false;
+	    if(eventStack.linkNode) {
+		linkobj.node1 = eventStack.linkNode;
+	    }
+	    if(eventStack.linkPt) {
+		linkobj.pt1 = eventStack.linkPt;
+	    }
+	    linkobj.pt2 = [e.clientX,e.clientY];
+	    eventStack.linkPt = undefined;
+	    eventStack.linkNode = undefined;
+	    crtLink(linkobj);
+	}
+    });
+}
+
+function readyToolbar() {
+    $("#addrect").click(function() {
+	initEventStack();
+	eventStack.addingRect = true;
+    });
+    $("#addlink").click(function() {
+	initEventStack();
+	eventStack.addingLink1 = true;
+    });
+}
 
 function crtRect(x,y) {
     var currect = svg.rect(x,y,100,100,4,4);
     $(currect).css('fill','white');
     $(currect).css('stroke','black');
+    $(currect).css('z-index','3');
+    $(currect).click(function() {
+	if (eventStack.addingLink1) {
+	    eventStack.addingLink2 = true;
+	    eventStack.linkNode = currect;
+	    eventStack.addingLink1 = false;
+	}
+	else if (eventStack.addingLink2 && eventStack.linkNode != currect) {
+	    eventStack.addingLink2 = false;
+	    var linkobj = new Object();
+	    eventStack.addingLink2 = false;
+	    if(eventStack.linkNode) {
+		linkobj.node1 = eventStack.linkNode;
+	    }
+	    if(eventStack.linkPt) {
+		linkobj.pt1 = eventStack.linkPt;
+	    }
+	    linkobj.node2 = currect;
+	    eventStack.linkPt = undefined;
+	    eventStack.linkNode = undefined;
+	    crtLink(linkobj);
+	}
+    });
+    $(currect).attr('id',"r"+objectStack.rects.length.toString());
+    $(currect).draggable();
+    $(currect).bind('drag', function(event, ui){
+        event.target.setAttribute('x', ui.position.left);
+	event.target.setAttribute('y', ui.position.top);
+    });
+    objectStack.rects.push(currect);
 }
 
 function crtArrow(startx,starty,endx,endy,dir,arrowcolor) {
-    if(dir == "downr") {
-	var endadjv = -arrowwidth*2;
-	var endadjh = -arrowwidth*2;
-    }
-    if(dir == "upr") {
-	var endadjv = arrowwidth*2;
-	var endadjh = -arrowwidth*2;	
-    }
     if(dir == "downl") {
-	var endadjv = -arrowwidth*2;
-	var endadjh = arrowwidth*2;	
+	var endadj = arrowwidth*2;
     }
     if(dir == "upl") {
-	var endadjv = arrowwidth*2;
-	var endadjh = arrowwidth*2;	
+	var endadj = arrowwidth*2;
+    }
+    if(dir == "downr") {
+	var endadj = -arrowwidth*2;
+    }
+    if(dir == "upr") {
+	var endadj = -arrowwidth*2;
     }
     var slope = (endy-starty)/(endx-startx);
     var negslope = (-1)/slope;
-    var arrowpt1x = (arrowwidth/(Math.sqrt(1+(negslope*negslope))))+(endx);
-    var arrowpt1y = ((arrowpt1x-(endx))*negslope)+(endy);
-    var arrowpt2x = (-(arrowwidth)/(Math.sqrt(1+(negslope*negslope))))+(endx);
-    var arrowpt2y = ((arrowpt2x-(endx))*negslope)+(endy);
-    var arrowshaft = svg.line(startx,starty,endx,endy,{strokeWidth:arrowstroke,stroke:arrowcolor});
-    //Figure out endpoints
-    var arrowhead = svg.polygon([[endx,endy],[arrowpt1x,arrowpt1y],
-				 [endx,endy],[arrowpt2x,arrowpt2y],[endx,endy]],{fill:arrowcolor});
+    var arrowpt0x = (endadj/(Math.sqrt(1+(slope*slope))))+(endx);
+    var arrowpt0y = ((arrowpt0x-(endx))*slope)+(endy);
+    var arrowpt1x = (arrowwidth/(Math.sqrt(1+(negslope*negslope))))+(arrowpt0x);
+    var arrowpt1y = ((arrowpt1x-(arrowpt0x))*negslope)+(arrowpt0y);
+    var arrowpt2x = (-(arrowwidth)/(Math.sqrt(1+(negslope*negslope))))+(arrowpt0x);
+    var arrowpt2y = ((arrowpt2x-(arrowpt0x))*negslope)+(arrowpt0y);
+    var arrowshaft = svg.line(startx,starty,endx,endy,{'strokeWidth':arrowstroke,'stroke':arrowcolor});
+    var arrowhead = svg.polygon([[arrowpt0x,arrowpt0y],[arrowpt1x,arrowpt1y],
+				 [endx,endy],[arrowpt2x,arrowpt2y],[arrowpt0x,arrowpt0y]],{'fill':arrowcolor});
+    var arrow = new Object();
+    $(arrowhead).css("padding","50px");
+    $(arrowshaft).css("padding","50px");
+    $(arrowhead).css("z-index","3");
+    $(arrowshaft).css("z-index","3");
+    var c1 = svg.circle(endx,endy,Math.abs(endadj/5),{'fill':'white','stroke':'black','strokeWidth':1});
+    var c2 = svg.circle(startx,starty,Math.abs(endadj/5),{'fill':'white','stroke':'black','strokeWidth':1});
+    $(c1).hide();
+    $(c2).hide();
+    arrow.head = arrowhead;
+    arrow.shaft = arrowshaft;
+    arrow.c1 = c1;
+    arrow.c2 = c2;
+    $(arrowhead).hover( function() {
+	$(c1).toggle();
+	$(c2).toggle();
+    });
+    $(arrowshaft).hover( function() {
+	$(c1).toggle();
+	$(c2).toggle();
+    });
+    objectStack.links.push(arrow);
+    return arrow;
 }
 
 function changeArrowWidth(x) {
@@ -50,34 +160,148 @@ function changeArrowStroke(x) {
     arrowstroke = x;
 }
 
-function crtLink(node1,node2) {
-    var node1w = parseInt($(node1).attr("width"));
-    var node1h = parseInt($(node1).attr("height"));
-    var node1y = parseInt($(node1).attr("y")) + (node1h/2);
-    var node1x = parseInt($(node1).attr("x")) + (node1w/2);
-    var node2w = parseInt($(node2).attr("width"));
-    var node2h = parseInt($(node2).attr("height"));
-    var node2y = parseInt($(node2).attr("y")) + (node2h/2);
-    var node2x = parseInt($(node2).attr("x")) + (node2w/2);
-    if (node1x > node2x) {
-	if (node1y > node2y) {
-	    if(Math.atan2(node1y-node2y,node1x-node2x) > Math.PI/4){
-		crtArrow(node1x,node1y-(node1h/2),node2x,node2y+(node2h/2),"upl","red");	
-	    }
-	    else {
-		crtArrow(node1x-(node1w/2),node1y,node2x+(node2w/2),node2y,"upl","red");
-	    }
+function crtLink(obj) {
+    var node1 = obj.node1;
+    var node2 = obj.node2;
+    var pt1 = obj.pt1;
+    var pt2 = obj.pt2;
+    var x1,y1;
+    var x2,y2;
+    if (pt1) {
+	x1 = pt1[0];
+	y1 = pt1[1];
+    }
+    if (pt2) {
+	if (pt1) {
+	    x2 = pt2[0];
+	    y2 = pt2[1];
 	}
 	else {
-	    if(Math.atan2(node1y-node2y,node1x-node2x) < -Math.PI/4){
-		crtArrow(node1x,node1y+(node1h/2),node2x,node2y-(node2h/2),"downl","red");	
+	    x1 = pt2[0];
+	    y1 = pt2[1];
+	}
+    }
+    if (node1) {
+	var n1w = parseInt($(node1).attr("width"));
+	var n1h = parseInt($(node1).attr("height"));
+	var n1y = parseInt($(node1).attr("y")) + (n1h/2);
+	var n1x = parseInt($(node1).attr("x")) + (n1w/2);	
+    }
+    if (node2) {
+	if (node1) {
+	    var n2w = parseInt($(node2).attr("width"));
+	    var n2h = parseInt($(node2).attr("height"));
+	    var n2y = parseInt($(node2).attr("y")) + (n2h/2);
+	    var n2x = parseInt($(node2).attr("x")) + (n2w/2);
+	}
+	else { 
+	    var n1w = parseInt($(node2).attr("width"));
+	    var n1h = parseInt($(node2).attr("height"));
+	    var n1y = parseInt($(node2).attr("y")) + (n1h/2);
+	    var n1x = parseInt($(node2).attr("x")) + (n1w/2);
+	}
+    }
+    if (pt2) {
+	if (pt1) {
+	    if (y2 > y1) {
+		if (x2 > x1) {
+		    crtArrow(x1,y1,x2,y2,"downr","red");
+		}
+		else {
+		    crtArrow(x1,y1,x2,y2,"downl","red");
+		}
 	    }
 	    else {
-		crtArrow(node1x-(node1h/2),node1y,node2x,node2y-(node2h/2),"downl","red");
+		if (x2 > x1) {
+		    crtArrow(x1,y1,x2,y2,"upr","red");
+		}
+		else {
+		    crtArrow(x1,y1,x2,y2,"upl","red");
+		}
+	    }   
+	}
+	else {
+	    x1 = pt2[0];
+	    y1 = pt2[0];
+	}
+    }
+    if (node2) {
+	if (node1) {
+	    if (n1x > n2x) {
+		if (n1y > n2y) {
+		    if(Math.atan2(n1y-n2y,n1x-n2x) > Math.PI/4){
+			crtArrow(n1x,n1y-(n1h/2),n2x,n2y+(n2h/2),"upl","red");
+		    }
+		    else {
+			crtArrow(n1x-(n1w/2),n1y,n2x+(n1w/2),n2y,"upl","red");
+		    }
+		}
+		else {
+		    if(Math.atan2(n1y-n2y,n1x-n2x) < -Math.PI/4){
+			crtArrow(n1x,n1y+(n1h/2),n2x,n2y-(n2h/2),"downl","red");
+		    }
+		    else {
+			crtArrow(n1x-(n1h/2),n1y,n2x,n2y-(n2h/2),"downl","red");
+		    }
+		}
+	    }
+	    else {
+		if (n1y > n2y) {
+		    if(Math.atan2(n2y-n1y,n2x-n1x) > -Math.PI/4){
+			crtArrow(n1x,n1y-(n1h/2),n2x-(n2w/2),n2y,"upr","red");
+		    }
+		    else {
+			crtArrow(n1x,n1y-(n1h/2),n2x,n2y+(n2h/2),"upr","red");
+		    }
+		}
+		else {
+		    if(Math.atan2(n2y-n1y,n2x-n1x) < Math.PI/4){
+			crtArrow(n1x+(n1w/2),n1y,n2x-(n2w/2),n2y,"downr","red");
+		    }
+		    else {
+			crtArrow(n1x,n1y+(n1h/2),n2x,n2y-(n2h/2),"downr","red");
+		    }
+		}
+	    }
+	}
+	else if (pt1) {
+	    if(x1 > n2x) {
+		if (y1 > n2y) {
+		    if(Math.atan2(y1-n2y,x1-n2x) > Math.PI/4){
+			crtArrow(x1,y1,n2x,n2y+(n2h/2),"upl","red");
+		    }
+		    else {
+			crtArrow(x1-(n1w/2),y1,n2x+(n1w/2),n2y,"upl","red");
+		    }
+		}
+		else {
+		    if(Math.atan2(y1-n2y,x1-n2x) < -Math.PI/4){
+			crtArrow(x1,y1,n2x,n2y-(n2h/2),"downl","red");
+		    }
+		    else {
+			crtArrow(x1,y1,n2x,n2y-(n2h/2),"downl","red");
+		    }
+		}
+	    }
+	    else {
+		if (y1 > n2y) {
+		    if(Math.atan2(n2y-y1,n2x-x1) > -Math.PI/4){
+			crtArrow(x1,y1,n2x-(n2w/2),n2y,"upr","red");
+		    }
+		    else {
+			crtArrow(x1,y1,n2x,n2y+(n2h/2),"upr","red");
+		    }
+		}
+		else {
+		    if(Math.atan2(n2y-y1,n2x-x1) < Math.PI/4){
+			crtArrow(x1,y1,n2x-(n2w/2),n2y,"downr","red");
+		    }
+		    else {
+			crtArrow(x1,y1,n2x,n2y-(n2h/2),"downr","red");
+		    }
+		}
 	    }
 	}
     }
 }
 
-//function crtLink(x1,x2,y1,y2) {
-//}
