@@ -7111,18 +7111,19 @@ td.visible-print {
 }
 
 .pagebody{
-    background-color: #6CE0FC;
-    opacity:0.25;
+    background-color: rgba(70, 184, 218, 0.4);
+    z-index: -1;
+    height:12in;
 }
 
 .toolborder{
     border-width: 5px;
-    border-color: #6CE0FC;
+    border-color: #46b8da;
     width: 160px;
     height: 200px;
     text-align: center;
-    box-shadow: 5px 5px 5px #A8AEB1;
-
+    box-shadow: 5px 5px 5px #000000;
+    margin-left: 15px;
 }
 
 .tooltext{
@@ -7132,19 +7133,22 @@ td.visible-print {
     width:105%;
 }
 
-.workspace{
-    background-color: white;
-    width:8.5in;
-    height:11in;
-    z-index: 4;
-    position:absolute;
-    padding-top:15px;
-    margin-left:auto;
-    margin-right:auto;
-}
-
 .box-text{
     border-width: 1px;
     border-color: black;
+    
+}
+
+#workspace{
+    width:8.5in;
+    height:11in;
+    position:absolute;
+    margin-top:50px;
+    margin-left:20%;
+    margin-right:auto;
+    margin-bottom:1cm;
+    background-color: #ffffff;
+    box-shadow: 10px 10px 5px #000000;
+    z-index: -20;
     
 }
