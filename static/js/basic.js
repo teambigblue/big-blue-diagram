@@ -5,7 +5,7 @@ var objectStack;
 
 $(document).ready(function() {
     $("#canvas").svg();
-    $("#toolbar").draggable();
+    $("#toolbar").draggable({'containment':'window'});
     svg = $("#canvas").svg('get');
     initCanvas();
     initEventStack();
@@ -68,7 +68,8 @@ function readyToolbar() {
 }
 
 function crtRect(x,y) {
-    var currect = svg.rect(x,y,100,100,4,4);
+    var currect = svg.text(x,y);
+    $(currect).addClass('box-text');
     $(currect).css('fill','white');
     $(currect).css('stroke','black');
     $(currect).css('z-index','3');
@@ -172,8 +173,10 @@ function changeArrowStroke(x) {
     arrowstroke = x;
 }
 
-function changeArrowHead(arrow,x,y) {
-    
+function changeArrowHead(arrow,dx,dy) {
+    arrow.head.getAttribute('x');
+    arrow.head.getAttribute('y');
+    arrow.head.setAttribute('transform','translate('+
 }
 
 function changeArrowTail(arrow,dx,dy) {
