@@ -7111,7 +7111,7 @@ td.visible-print {
 }
 
 .pagebody{
-    background-color: rgba(70, 184, 218, 0.4);
+    background-color: rgba(70, 184, 218, 0.6);
     z-index: -1;
     height:12in;
 }
@@ -7124,6 +7124,7 @@ td.visible-print {
     text-align: center;
     box-shadow: 5px 5px 5px #000000;
     margin-left: 15px;
+    margin-top: 50px;
 }
 
 .tooltext{
@@ -7151,4 +7152,9 @@ td.visible-print {
     box-shadow: 10px 10px 5px #000000;
     z-index: -20;
     
+}
+
+#tooltext{
+    font-family: "courier",Times,serif;
+    font-size:large;
 }
