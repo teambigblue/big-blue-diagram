@@ -7110,9 +7110,13 @@ td.visible-print {
     color:black;
 }
 
+.pagebody{
+    background-color: #6CE0FC;
+    opacity:0.25;
+}
+
 .toolborder{
     border-width: 5px;
-#    border-style:ridge;
     border-color: #6CE0FC;
     width: 160px;
     height: 200px;
@@ -7126,4 +7130,21 @@ td.visible-print {
     margin-left:auto;
     margin-right:auto;
     width:105%;
+}
+
+.workspace{
+    background-color: #000000;
+    width:8.5in;
+    height:11in;
+    z-index: 4;
+    position:absolute;
+    padding-top:15px;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+.box-text{
+    border-width: 1px;
+    border-color: black;
+    
 }
