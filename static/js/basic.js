@@ -148,6 +148,8 @@ function crtArrow(startx,starty,endx,endy,dir,arrowcolor) {
     $(c2).hide();
     arrow.head = arrowhead;
     arrow.shaft = arrowshaft;
+    arrow.point = [endx,endy];
+    arrow.ang = Math.atan2(endy-starty,endx-startx);
     arrow.c1 = c1;
     arrow.c2 = c2;
     $(arrowhead).hover( function() {
@@ -175,8 +177,15 @@ function changeArrowHead(arrow,x,y) {
 }
 
 function changeArrowTail(arrow,dx,dy) {
-    arrow.shaft.setAttribute('x1',(parseInt(arrow.shaft.getAttribute('x1'))-parseInt(dx)).toString());
-    arrow.shaft.setAttribute('y1',(parseInt(arrow.shaft.getAttribute('y1'))-parseInt(dy)).toString());
+    origx1 = arrow.shaft.getAttribute('x1');
+    origy1 = arrow.shaft.getAttribute('y1');
+    newx1 = parseInt(origx1)-parseInt(dx);
+    newy1 = parseInt(origy1)-parseInt(dy);
+    arrow.shaft.setAttribute('x1',(newx1).toString());
+    arrow.shaft.setAttribute('y1',(newy1).toString());
+    theta = Math.atan2(arrow.point[1]-newy1,arrow.point[0]-newx1);
+    theta = (arrow.ang*180/Math.PI) - (theta*180)/Math.PI;
+    arrow.head.setAttribute('transform','rotate('+theta*-1+','+arrow.point[0]+','+arrow.point[1]+')');
 }
 
 function crtLink(obj) {
