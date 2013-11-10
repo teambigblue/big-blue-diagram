@@ -7,6 +7,7 @@ $(document).ready(function() {
     $("#canvas").svg();
     $("#toolbar").draggable({'containment':'window'});
     svg = $("#canvas").svg('get');
+//    $(svg).click(function() {console.log("here");});
     initCanvas();
     initEventStack();
     readyToolbar();
@@ -68,8 +69,7 @@ function readyToolbar() {
 }
 
 function crtRect(x,y) {
-    var currect = svg.text(x,y);
-    $(currect).addClass('box-text');
+    var currect = svg.rect(x,y,100,100,4,4);
     $(currect).css('fill','white');
     $(currect).css('stroke','black');
     $(currect).css('z-index','3');
@@ -95,7 +95,11 @@ function crtRect(x,y) {
 	    crtLink(linkobj);
 	}
     });
-    $(currect).attr('id',"r"+objectStack.rects.length.toString());
+    var newID = objectStack.rects.length.toString();
+    $(currect).attr('id',"r"+newID);
+    $("#workspace").append("<textarea id='rt"+newID+"'></textbox>");
+    currect.textarea = $("#rt"+newID).get(0);
+    $(currect.textarea).css({'left':x,'top':y});
     currect.head = [];
     currect.tail = [];
     $(currect).draggable();
@@ -104,6 +108,8 @@ function crtRect(x,y) {
 	var dy = event.target.getAttribute('y') - ui.position.top;
         event.target.setAttribute('x', ui.position.left);
 	event.target.setAttribute('y', ui.position.top);
+	event.target.textarea.setAttribute('x',ui.position.left);
+	event.target.textarea.setAttribute('y',ui.position.top);
 	for(var i=0;i<event.target.head.length;i++) {
 	    changeArrowHead(event.target.head[i],dx,dy)
 	}
@@ -176,7 +182,7 @@ function changeArrowStroke(x) {
 function changeArrowHead(arrow,dx,dy) {
     arrow.head.getAttribute('x');
     arrow.head.getAttribute('y');
-    arrow.head.setAttribute('transform','translate(');
+   // arrow.head.setAttribute('transform','translate('+
 }
 
 function changeArrowTail(arrow,dx,dy) {
