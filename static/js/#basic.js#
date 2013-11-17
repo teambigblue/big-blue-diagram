@@ -475,17 +475,18 @@ function crtLink(obj) {
     }
 }
 
-function flashingHandler(event) {
-    if(event.target.text.on) {
-	var curtext = $(event.target.text).text();
+function flashingHandler() {
+    selected = eventStack.selectedRect;
+    if(selected.text.on) {
+	var curtext = $(selected.text).text();
 	var newtext = curtext.substring(0,curtext.length-1);
-	$(event.target.text).text(newtext);
+	$(selected.text).text(newtext);
 	console.log("off");
     }
     else {
-	var curtext = $(event.target.text).text();
+	var curtext = $(selected.text).text();
 	var newtext = curtext.concat('|');
-	$(event.target.text).text(newtext);
+	$(selected.text).text(newtext);
 	console.log("on");
     }
 }
