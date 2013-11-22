@@ -99,29 +99,34 @@ function crtRect(x,y) {
 	}
     });
     $(currect).attr('id',"r"+newID);
-    currect.text = svg.text(curgroup,x,y,"");
+    currect.text = svg.text(curgroup,x+10,y+15,"");
     currect.head = [];
     currect.tail = [];
     currect.flashing = false;
     currect.flashingInt;
+    $(currect).keypress(function(event) {
+	console.log("here");
+	console.log(event.which);
+    });
     $(currect).dblclick(function(event) {
 	if(event.target.text.flashing) {
-	    console.log("clearing Interval");
 	    clearInterval(event.target.flashingInt);
 	    event.target.flashing = false;
+	    $(document).focus();
 	}
 	else {
 	    eventStack.selectedRect = event.target;
-	    event.target.flashingInt = setInterval("flashingHandler",500);
+	    event.target.flashingInt = setInterval(flashingHandler,500);
 	    event.target.flashing = true;
+	    $(event.target).focus();
 	}
     });
     $(currect).draggable({'containment':$("#canvas")});
     $(currect).bind('drag', function(event, ui){
 	var dx = event.target.getAttribute('x') - ui.position.left;
 	var dy = event.target.getAttribute('y') - ui.position.top;
-	event.target.text.setAttribute('x',ui.position.left);
-	event.target.text.setAttribute('y',ui.position.top);
+	event.target.text.setAttribute('x',ui.position.left+10);
+	event.target.text.setAttribute('y',ui.position.top+15);
         event.target.setAttribute('x', ui.position.left);
 	event.target.setAttribute('y', ui.position.top);
 	for(var i=0;i<event.target.head.length;i++) {
@@ -475,17 +480,17 @@ function crtLink(obj) {
     }
 }
 
-function flashingHandler(event) {
-    if(event.target.text.on) {
-	var curtext = $(event.target.text).text();
+function flashingHandler() {
+    if(eventStack.selectedRect.text.on) {
+	var curtext = $(eventStack.selectedRect.text).text();
 	var newtext = curtext.substring(0,curtext.length-1);
-	$(event.target.text).text(newtext);
-	console.log("off");
+	$(eventStack.selectedRect.text).text(newtext);
+	eventStack.selectedRect.text.on = false;
     }
     else {
-	var curtext = $(event.target.text).text();
+	var curtext = $(eventStack.selectedRect.text).text();
 	var newtext = curtext.concat('|');
-	$(event.target.text).text(newtext);
-	console.log("on");
+	$(eventStack.selectedRect.text).text(newtext);
+	eventStack.selectedRect.text.on = true;
     }
 }
